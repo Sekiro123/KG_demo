@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>文本标注</title>
+
+    <script src="js/jquery-3.2.1.min.js"></script>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <script src="js/bootstrap.min.js"></script>
+    <link href="css/dashboard.css" rel="stylesheet">
+
+    <style type="text/css">
+        .text_unlabel{
+            float:left;
+            font-size: 18px;
+            font-family: "Microsoft YaHei", SimHei, SimSun;
+
+        }
+        .text_top{
+            float:left;
+            font-size: 10px;
+            font-weight: bold;
+            font-family: "Microsoft YaHei", SimHei, SimSun;
+            text-anchor: middle;
+            dominant-baseline: middle;
+        }
+    </style>
+
+
+</head>
+<body>
+    <!--导航栏-->
+    <nav class="navbar navbar-default navbar-fixed-top">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#">
+                    <span class="glyphicon glyphicon-cloud" aria-hidden="true"></span>
+                    知识图谱云平台
+                </a>
+            </div>
+            <div id="navbar" class="navbar-collapse collapse">
+                <ul class="nav navbar-nav navbar-left">
+                    <li><a href="#">首页</a></li>
+                    <li class="active"><a href="#">云服务</a></li>
+                    <li><a href="#">商务合作</a></li>
+                    <li><a href="#">帮助中心</a></li>
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="#">登录|注册</a></li>
+                    <li><a href="#">用户中心</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <!--主体-->
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-3 col-md-2 sidebar">
+                <ul class="nav nav-sidebar">
+                    <li><a href="#">
+                        <span class="glyphicon glyphicon-th-list" aria-hidden="true"></span>
+                        概览
+                        <span class="sr-only">(current)</span></a></li>
+                    <li class="active"><a href="#"><span class="glyphicon glyphicon-tasks" aria-hidden="true"></span>文本标注</a></li>
+                    <li><a href="/KGcloud/entity.html"><span class="glyphicon glyphicon-tasks" aria-hidden="true"></span>关系查询</a></li>
+                    <li><a href="/KGcloud/ontology.html"><span class="glyphicon glyphicon-tasks" aria-hidden="true"></span>本体建模</a></li>
+                    <li><a href=""><span class="glyphicon glyphicon-tasks" aria-hidden="true"></span>功能</a></li>
+                    <li><a href=""><span class="glyphicon glyphicon-tasks" aria-hidden="true"></span>功能</a></li>
+                    <li><a href=""><span class="glyphicon glyphicon-tasks" aria-hidden="true"></span>功能</a></li>
+                </ul>
+            </div>
+            <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+                <h1 class="page-header">
+                    <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
+                    文本标注
+                </h1>
+
+                <div class="row placeholders">
+                    <div class="col-md-6">
+                        <img src="./img/AI.jpg" width="500" height="500" class="img-thumbnail" alt="Generic placeholder thumbnail">
+                    </div>
+                    <div class="col-md-6">
+                        <h2>文本标注</h2>
+                        <span class="text-muted">用户根据已有实体类型和关系类型对非结构化文本标注</span>
+                    </div>
+                </div>
+                <!--画布-->
+                <div class="thumbnail" id="main" style="width:900px;height:300px;">
+                    <svg width="900" height="200" id="grand_board" xmlns="http://www.w3.org/2000/svg" version="1.1">
+                        <g id="board">
+                            <text x="50" y="80" class="text_unlabel" id="text" >
+                                《让子弹飞》是由姜文执导，姜文、葛优等主演的剧情片，于2010年12月16日在中国大陆上映。
+                            </text>
+                        </g>
+                    </svg>
+                </div>
+                <!--表格-->
+                <div class="thumbnail" style="width:900px;height:300px;">
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th>起始类型</th>
+                            <th>起始名称</th>
+                            <th>目标类型</th>
+                            <th>目标名称</th>
+                            <th>关系类型</th>
+                            <th>id</th>
+                        </tr>
+                        </thead>
+                        <tbody id="tbody">
+                        </tbody>
+                    </table>
+                </div>
+                <!--提交按钮-->
+                <div class="form-group">
+                    <button type="button" id="submit_result" class="btn btn-default">提交</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--画布-->
+
+    <!-- 实体模态框 -->
+    <div class="modal fade" id="entity_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">
+                        选择实体类型
+                    </h4>
+                </div>
+                <!--模态框主体-->
+                <div class="modal-body">
+                    <div class="col-sm-6">
+                        <select class="form-control" id="select_entity">
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal" id="entity_deny">关闭</button>
+                    <button type="button" class="btn btn-primary" id="entity_confirm">提交</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal -->
+    </div>
+    <!-- 关系模态框 -->
+    <div class="modal fade" id="relation_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">
+                        选择关系类型
+                    </h4>
+                </div>
+                <!--模态框主体-->
+                <div class="modal-body">
+                    <div class="col-sm-6">
+                        <select class="form-control" id="select_relation">
+                        </select>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal" id="relation_deny">关闭</button>
+                    <button type="button" class="btn btn-primary" id="relation_confirm">提交</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script>
+    var board = document.getElementById("board")
+    var unlabel_text = "《让子弹飞》是由姜文执导，姜文、葛优等主演的剧情片，于2010年12月16日在中国大陆上映。"
+    var entity = ["电影" ,"演员" ,"导演" ,"时间"]
+    var relation = ["出演" ,"执导" ,"上映日期"]
+    username = "username"
+
+    selected_obj = window.getSelection()
+
+    var labeled_entity = {}
+    var labeled_relation = {}
+    var relationship = {}
+    var result = {}
+
+
+
+    var start_entity_id = 0
+    var end_entity_id = 0
+    var entity_id = 0
+    var relation_id = 0
+    var mouse_x = 0
+    var mouse_y = 0
+    var path_start_x = 0
+    var path_start_y = 0
+
+    var rect_bottom_y = 61
+    var rect_top_y = rect_bottom_y-25
+
+    var path_start
+    //添加实体类型
+    for (var i=0;i<entity.length;i++)
+    {
+        var node = document.createElement("option")
+        node.innerHTML = entity[i]
+        document.getElementById("select_entity").appendChild(node)
+    }
+    //添加关系类型
+    for (var i=0;i<relation.length;i++)
+    {
+        var node = document.createElement("option")
+        node.innerHTML = relation[i]
+        document.getElementById("select_relation").appendChild(node)
+    }
+    //选取字符串,触发模态框
+    $("#grand_board").mouseup(function (e) {
+        //获取选取的字符串
+        Text_ori = $("#text")
+        selected_obj = window.getSelection()
+        if (selected_obj.toString().length > 0){
+            //弹出entity模态框
+            $('#entity_modal').modal('show')
+        }
+    })
+
+    //点击entity_confirm按钮，选择实体类型，生成rect_bottom与rect_top
+    $("#entity_confirm").click(function (){
+        //获取选择的内容
+        var options=$("#select_entity option:selected")
+        if (selected_obj.toString().length > 0){
+            //获取rect_bottom参数
+            var str_total = cut_text(Text_ori,selected_obj)
+            var str_front = str_total[0]
+            var str_last = str_total[1]
+            var str_select = str_total[2]
+            var rect_x = getTextSize(str_front,"text_unlabel")[0] +50
+            var rect_y = rect_bottom_y
+            var rect_width = getTextSize(str_select,"text_unlabel")[0]
+            var rect_height = getTextSize(str_select,"text_unlabel")[1]
+            //创建rect_bottom并设置参数
+            var rect = creat_rect()
+            rect.setAttribute( "x", rect_x );
+            rect.setAttribute( "y", rect_y );
+            rect.setAttribute( "width", rect_width );
+            rect.setAttribute( "height", rect_height );
+            rect.setAttribute( "style", "fill:blue;fill-opacity:0.2" );
+            //添加rect_bottom子元素
+            board.appendChild(rect)
+            //生成rect_bottom
+            last_rect = $(".rect_bottom")[document.getElementsByClassName("rect_bottom").length-1]
+            top_rect = $(last_rect).clone()
+            top_rect.attr("y" , rect_top_y)
+            top_rect.attr("height" , 20)
+            top_rect.attr("class" , "rect_top")
+            top_rect.attr("id" ,entity_id.toString()+"_rect_top")
+            //给rect_top绑定点击画箭头事件
+            top_rect.on("mousedown" ,function (e){
+                drawing_path = $(".drawing")
+                //如果 没有 正在画的path 画一个初始path
+                if (drawing_path.length === 0){
+                    //设置path路径参数
+                    path_start_x = mouse_x
+                    path_start_y = mouse_y
+                    path_start="M "+mouse_x.toString()+" "+mouse_y.toString()+" "
+                    path_middle = "q 40 0 "
+                    path_end = "0 0"
+                    path_total = path_start+path_middle+path_end
+                    //创建path设置其他参数
+                    rel_path = creat_path()
+                    rel_path.setAttribute("d" ,path_total)
+                    rel_path.setAttribute("stroke" ,"blue")
+                    rel_path.setAttribute("storke-width" ,"3")
+                    rel_path.setAttribute("fill" ,"none")
+                    rel_path.setAttribute("class" ,"drawing")
+                    rel_path.setAttribute("id" ,relation_id.toString()+"_relation_path")
+                    //记录起点start_entity_id
+                    start_entity_id = parseInt($(this).attr("id").split("_")[0])
+                    //添加path子元素
+                    board.appendChild(rel_path)
+                }else{
+                    //如果有正在画的path，说明所点击的rect_top为end_entity
+                    end_entity_id = parseInt($(this).attr("id").split("_")[0])
+                    drawing_path.attr("class" ,"drawn")
+                    //展示relation模态框
+                    $('#relation_modal').modal('show')
+                }
+            })
+
+            //写实体名字,创建text元素
+            top_text = creat_text()
+            top_text.setAttribute( "x", parseInt(top_rect.attr("x"))+parseInt(top_rect.attr("width"))/2);
+            top_text.setAttribute( "y", parseInt(top_rect.attr("y"))+parseInt(top_rect.attr("height"))/2);
+            top_text.setAttribute( "class", "text_top" );
+            top_text.innerHTML = options.val()
+            board.appendChild(top_text)
+            //添加rect_top子元素
+            board.appendChild(top_rect[0])
+            //关闭模态框
+            $('#entity_modal').modal('hide')
+            //更新labeled_entity字典
+            labeled_entity_mem = {"top":entity_id.toString()+"_rect_top" ,"bottom":entity_id.toString()+"_rect_bottom" ,"entity":options.val(),"content":window.getSelection().toString()}
+            labeled_entity[entity_id] = labeled_entity_mem
+            //清除选中的文字
+            window.getSelection().removeAllRanges();
+        }
+    })
+
+    //点击确认，选择关系类型
+    $("#relation_confirm").click(function (){
+        drawn_path = $(".drawn")
+        drawn_path.attr("class" ,"drawn_confirmed")
+        //更新labeled_relation字典
+        var options=$("#select_relation option:selected")
+        labeled_relation_mem = {"path":relation_id.toString()+"_relation_path" ,"relation":options.val()}
+        labeled_relation[relation_id] = labeled_relation_mem
+        //更新relationship数组
+        var relationship_mem = {"start_entity_id":start_entity_id,"end_entity_id":end_entity_id,"relation_id":relation_id}
+        relationship[Object.keys(relationship).length+1] = relationship_mem
+        $('#relation_modal').modal('hide')
+        //更新表格与result数据
+        td_start_entity = labeled_entity[relationship_mem["start_entity_id"]]["entity"]
+        td_start_content = labeled_entity[relationship_mem["start_entity_id"]]["content"]
+        td_end_entity = labeled_entity[relationship_mem["end_entity_id"]]["entity"]
+        td_end_content = labeled_entity[relationship_mem["end_entity_id"]]["content"]
+        td_relation = labeled_relation[relationship_mem["relation_id"]]["relation"]
+        td_id = Object.keys(relationship).reverse()[0]
+        result[td_id] = [username,td_start_entity,td_start_content,td_end_entity,td_end_content,td_relation,"《让子弹飞》是由姜文执导，姜文、葛优等主演的剧情片，于2010年12月16日在中国大陆上映。"]
+        //更新表格
+        var tr = document.createElement("tr")
+        td1=creat_td()
+        td2=creat_td()
+        td3=creat_td()
+        td4=creat_td()
+        td5=creat_td()
+        td6=creat_td()
+        td1.innerHTML=td_start_entity
+        td2.innerHTML=td_start_content
+        td3.innerHTML=td_end_entity
+        td4.innerHTML=td_end_content
+        td5.innerHTML=td_relation
+        td6.innerHTML=td_id
+        tr.appendChild(td1)
+        tr.appendChild(td2)
+        tr.appendChild(td3)
+        tr.appendChild(td4)
+        tr.appendChild(td5)
+        tr.appendChild(td6)
+        document.getElementById("tbody").appendChild(tr)
+        //打印结果
+        console.log(result)
+        console.log(labeled_entity)
+        console.log(labeled_relation)
+        console.log(relationship)
+    })
+
+    //点击提交按钮
+    $("#submit_result").click(function (e){
+        $.ajax({
+            type: 'post',
+            url:'http://3580656qa1.qicp.vip/tag/insert',
+            contentType:'application/x-www-form-urlencoded',
+            data:{
+                "result":JSON.stringify(result)
+            },
+            async:true,
+            dataType:"text",
+            success:function (data,status,xhr) {
+                console.log(data)
+                console.log(status)
+                console.log(xhr)
+                if (data === "saved!"){
+                    alert("提交成功！")
+                }
+                else{
+                    alert("未登录，请您登录！")
+                    window.location.href="http://3580656qa1.qicp.vip/KGcloud/"
+                }
+            },
+            error:function (xhr,status,error) {
+                console.log(xhr)
+                console.log(status)
+                console.log(error)
+                alert("连接超时")
+            }
+        })
+    })
+
+    //点击entity_modal的关闭按钮，清空选中的文字
+    $("#entity_deny").click(function (e){
+        //清除选中的文字
+        window.getSelection().removeAllRanges();
+    })
+
+
+    //点击relation_modal的关闭按钮，撤销之前的连线
+    $("#relation_deny").click(function (e){
+        last_drawn = $(".drawn")[document.getElementsByClassName("drawn").length-1]
+        last_drawn.remove()
+        relation_id--
+    })
+
+    //relation_madal隐藏时清除所有grawn状态的path
+    $('#relation_modal').on('hidden.bs.modal', function () {
+        drawn_path = $(".drawn")
+        if (drawn_path.length === 0){
+        }else{
+            last_drawn = $(".drawn")[document.getElementsByClassName("drawn").length-1]
+            last_drawn.remove()
+            relation_id--
+        }
+    })
+
+    //捕捉鼠标坐标 并拉曲线
+    $("#grand_board").mousemove(function (e){
+        mouse_x = e.offsetX
+        mouse_y = e.offsetY
+        //如果存在drawn的path，更新路径
+        if ($(".drawing").length>0){
+            path_end_x = mouse_x-path_start_x
+            path_end_y = mouse_y-path_start_y-1
+            path_middle_x = path_end_x/2
+            path_middle_y = -(40+Math.abs(path_middle_x)/10)
+
+            path_end= path_end_x.toString()+" "+path_end_y.toString()+" "
+            path_middle = "q "+path_middle_x.toString()+" "+path_middle_y.toString()+" "
+            $(".drawing").attr("d" ,path_start+path_middle+path_end)
+        }
+
+    })
+
+    //生成表格元素
+    function creat_td(){
+        var td = document.createElement('td')
+        return td
+    }
+
+    //生成曲线
+    function creat_path(){
+        relation_id++
+        var path = document.createElementNS("http://www.w3.org/2000/svg", 'path')
+        path.setAttribute("class" ,"path")
+        return path
+    }
+
+    //生成矩形框
+    function creat_rect(){
+        entity_id++
+        var rect = document.createElementNS("http://www.w3.org/2000/svg", 'rect')
+        rect.setAttribute("class" ,"rect_bottom")
+        rect.setAttribute("href" ,"#")
+        rect.setAttribute("id" ,entity_id.toString()+"_rect_bottom")
+        return rect
+    }
+
+    //生成文字
+    function creat_text(){
+        var text = document.createElementNS("http://www.w3.org/2000/svg", 'text')
+        return text
+    }
+
+    //切割字符串(jQ对象, selection对象)
+    function cut_text(Text, sel_obj){
+        Text_ori = Text.text()
+        Text_ori_len = Text_ori.length
+        //选取的对象
+        selected_obj = sel_obj
+        //选取的字符串
+        selected_text = selected_obj.toString()
+        //选取字符串的前后索引
+        if (selected_obj.anchorOffset<=selected_obj.focusOffset){
+            front = selected_obj.anchorOffset
+            last = selected_obj.focusOffset
+        }else{
+            front = selected_obj.focusOffset
+            last = selected_obj.anchorOffset
+        }
+        //将字符串分为三个
+        str_front = Text_ori.slice(0,front)
+        str_last = Text_ori.slice(last,Text_ori_len)
+        return [str_front, str_last, selected_text]
+    }
+
+
+
+    //计算字符像素长宽(字符，样式)
+    function getTextSize(str,style){
+        var width = 0;
+        var ele = document.createElementNS("http://www.w3.org/2000/svg", 'text')
+        board.appendChild(ele)
+        ele = $(ele)
+        ele.text(str)
+        ele.addClass(style)
+        ele = ele[0]
+        width = ele.getBoundingClientRect().width
+        height = ele.getBoundingClientRect().height
+        board.removeChild(ele)
+        return  [width,height]
+    }
+
+</script>
+</html>

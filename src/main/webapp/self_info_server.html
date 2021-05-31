@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="./favicon.ico">
+
+    <title>个人信息</title>
+
+    <script src="js/jquery-3.2.1.min.js"></script>
+    <link href="./css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/dashboard.css" rel="stylesheet">
+    <script src="/js/echarts.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="//cdn.bootcss.com/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+
+    
+</head>
+
+
+<body>
+    
+    
+    <nav class="navbar navbar-default navbar-fixed-top">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#">
+                    <span class="glyphicon glyphicon-cloud" aria-hidden="true"></span>
+                    知识图谱云平台
+                </a>
+            </div>
+            <div id="navbar" class="navbar-collapse collapse">
+                <ul class="nav navbar-nav navbar-left">
+                    <li><a href="#">首页</a></li>
+                    <li class="active"><a href="#">云服务</a></li>
+                    <li><a href="#">商务合作</a></li>
+                    <li><a href="#">帮助中心</a></li>
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="#">登录|注册</a></li>
+                    <li><a href="http://3580656qa1.qicp.vip/back/index.html">用户中心</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-3 col-md-2 sidebar">
+                <ul class="nav nav-sidebar">
+                    <li><a href="#" class="active">
+                        <span class="glyphicon glyphicon-th-list" aria-hidden="true"></span>
+                        概览
+                        <span class="sr-only">(current)</span></a></li>
+                    <li><a href="/KGcloud/label_Utils.html"><span class="glyphicon glyphicon-tasks" aria-hidden="true"></span>文本标注</a></li>
+                    <li><a href="/KGcloud/entity.html"><span class="glyphicon glyphicon-tasks" aria-hidden="true"></span>实体查询</a></li>
+                    <li><a href="/KGcloud/ontology.html"><span class="glyphicon glyphicon-tasks" aria-hidden="true"></span>本体建模</a></li>
+                    <li class="active"><a href="/KGcloud/self_info_server.html"><span class="glyphicon glyphicon-tasks" aria-hidden="true"></span>个人信息</a></li>
+                    <li><a href="/KGcloud/unqualified.html"><span class="glyphicon glyphicon-tasks" aria-hidden="true"></span>无效标注</a></li>
+                    <li><a href="/KGcloud/qualified.html"><span class="glyphicon glyphicon-tasks" aria-hidden="true"></span>有效标注</a></li>
+                </ul>
+            </div>
+            <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+                <h1 class="page-header">
+                    <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
+                    个人信息
+                </h1>
+
+                <div class="row placeholders">
+                    <div class="col-md-6">
+                        <h2 >本体建模信息</h2>
+                        <table class="table table-bordered">
+                            <thead id="thead_model">
+                                <tr>
+                                    <th >id</th>
+                                    <th >field</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <h2>参与标注信息</h2>
+                        <table class="table table-bordered">
+                            <thead id="thead_tag">
+                                <tr>
+                                    <th >账号</th>
+                                    <th >标注总数量</th>
+                                    <th >标注句子数量</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td align="left" id="account_info"></td>
+                                    <td align="left" id="num_tag_info"></td>
+                                    <td align="left" id="num_sentence_info"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                </div>
+                
+                
+            </div>
+        </div>
+    </div>
+    <script>
+       
+        
+
+    function jump(url){
+        window.location=url;
+    }
+    var change=" onclick='edit_model($(this).text())' style='cursor:pointer' onMouseOver='this.style.cursor=\"hand\";this.style.backgroundColor=\"#fbedbc\";' onMouseOut='this.style.backgroundColor=\"white\"';'";
+    $.post("http://3580656qa1.qicp.vip/user/findUserInfo",{
+        account:"ming"
+    },function(data,status){
+        console.log(data);
+        var info=$.parseJSON(data);
+        $("#account_info").text(info.account);
+        $("#num_tag_info").text(info.numTag);
+        $("#num_sentence_info").text(info.numSentences);
+        
+    })
+    function edit_model(s){
+        console.log(s);
+        $.cookie("field", s, { path: "/"}); 
+        console.log($.cookie("cookie"))
+        window.location="";
+    }
+    $.post("http://3580656qa1.qicp.vip/modeling/relation/findFields",{
+        account:"ming"
+    },function(data,status){
+        console.log(data);
+        var fields=$.parseJSON(data);
+        var content="<tbody>";
+            // var content=""
+        for(var i=0;i<fields.length;i++){
+            var s="<tr><td align='left'>"+i+"</td><td align='left'"+change+">"+fields[i]+"</td></tr>";
+            content=content+s;
+        }
+        content=content+"</tbody>"
+        var tbody=$("<tbody></tbody>").text(content);
+        $("#thead_model").after(content);
+    })
+    
+       
+    </script>
+</body>
+</html>

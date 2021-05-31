@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>个人信息</title>
+
+    <script src="js/jquery-3.2.1.min.js"></script>
+    <link href="./css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/dashboard.css" rel="stylesheet">
+    <script src="js/echarts.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="https://cdn.staticfile.org/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+    <link rel="stylesheet" href="https://www.layuicdn.com/layui-v2.5.6/css/layui.css" media="all">
+    <script src="https://www.layuicdn.com/layui-v2.5.6/layui.js" charset="utf-8"></script>
+</head>
+
+
+<body>
+    
+    
+    <nav class="navbar navbar-default navbar-fixed-top">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#">
+                    <span class="glyphicon glyphicon-cloud" aria-hidden="true"></span>
+                    知识图谱云平台
+                </a>
+            </div>
+            <div id="navbar" class="navbar-collapse collapse">
+                <ul class="nav navbar-nav navbar-left">
+                    <li><a href="#">首页</a></li>
+                    <li class="active"><a href="#">云服务</a></li>
+                    <li><a href="#">商务合作</a></li>
+                    <li><a href="#">帮助中心</a></li>
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="#">登录|注册</a></li>
+                    <li><a href="http://3580656qa1.qicp.vip/back/index.html">用户中心</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-3 col-md-2 sidebar">
+                <ul class="nav nav-sidebar">
+                    <li><a href="#" class="active">
+                        <span class="glyphicon glyphicon-th-list" aria-hidden="true"></span>
+                        概览
+                        <span class="sr-only">(current)</span></a></li>
+                    <li><a href="/KGcloud/label_Utils.html"><span class="glyphicon glyphicon-tasks" aria-hidden="true"></span>文本标注</a></li>
+                    <li><a href="/KGcloud/entity.html"><span class="glyphicon glyphicon-tasks" aria-hidden="true"></span>实体查询</a></li>
+                    <li><a href="/KGcloud/ontology.html"><span class="glyphicon glyphicon-tasks" aria-hidden="true"></span>本体建模</a></li>
+                    <li><a href="/KGcloud/self_info_server.html"><span class="glyphicon glyphicon-tasks" aria-hidden="true"></span>个人信息</a></li>
+                    <li><a href="/KGcloud/unqualified.html"><span class="glyphicon glyphicon-tasks" aria-hidden="true"></span>无效标注</a></li>
+                    <li class="active"><a href="/KGcloud/qualified.html"><span class="glyphicon glyphicon-tasks" aria-hidden="true"></span>有效标注</a></li>
+                </ul>
+            </div>
+            <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main" style="height: 30px;"></div>
+             <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+                <table class="layui-hide" id="currentTableId" lay-filter="currentTableFilter"></table>
+            </div> 
+            
+        </div>
+    </div>
+    <script>
+       
+        
+
+    function jump(url){
+        window.location=url;
+    }
+    
+    var address="http://3580656qa1.qicp.vip/tag/"
+    var result=new Object();
+    // $.cookie('account','ming');
+    result.account=$.cookie('account');
+    result=JSON.stringify(result)
+    layui.use(['form', 'table'], function () {
+        var $ = layui.jquery,
+            form = layui.form,
+            table = layui.table;
+
+        table.render({
+            elem: '#currentTableId',
+            url: address+'qualifiedBackFindByPage',
+            cols: [[
+                {type: "checkbox", width: 50},
+                {field: 'account', width: 80, title: '账号', sort: true},
+                {field: 'field', width: 80, title: '领域', sort: true},
+                {field: 'subject', width: 120, title: '实体1', sort: true},
+                {field: 'subject_properties', width: 80, title: '1类型', sort: true},
+                {field: 'relation', title: '关系', Width: 80, sort: true},
+                {field: 'object', width: 120, title: '实体2', sort: true},
+                {field: 'object_properties', width: 100, title: '2类型', sort: true},
+                {field: 'sentence', minwidth: 120, title: '句子', sort: true},
+                {field: 'time', width: 75, title: '时间', sort: true},
+                {title: '操作', minWidth: 150, toolbar: '#currentTableBar', align: "center"}
+            ]],
+            limits: [10, 15, 20, 25, 50, 100],
+            limit: 15,
+            page: true,
+            skin: 'line',
+            where:{
+                searchParams: result
+            }
+        });
+    });
+      
+
+        
+
+        
+       
+    </script>
+</body>
+</html>

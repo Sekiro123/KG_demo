@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="./favicon.ico">
+
+    <title>本体建模</title>
+
+    <script src="js/jquery-3.2.1.min.js"></script>
+    <link href="./css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/dashboard.css" rel="stylesheet">
+    <script type="text/javascript" src="dist/echarts.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+
+</head>
+<body>
+    <nav class="navbar navbar-default navbar-fixed-top">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#">
+                    <span class="glyphicon glyphicon-cloud" aria-hidden="true"></span>
+                    知识图谱云平台
+                </a>
+            </div>
+            <div id="navbar" class="navbar-collapse collapse">
+                <ul class="nav navbar-nav navbar-left">
+                    <li><a href="#">首页</a></li>
+                    <li class="active"><a href="#">云服务</a></li>
+                    <li><a href="#">商务合作</a></li>
+                    <li><a href="#">帮助中心</a></li>
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="#">登录|注册</a></li>
+                    <li><a href="#">用户中心</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-3 col-md-2 sidebar">
+                <ul class="nav nav-sidebar">
+                    <li><a href="#">
+                        <span class="glyphicon glyphicon-th-list" aria-hidden="true"></span>
+                        概览
+                        <span class="sr-only">(current)</span></a></li>
+                    <li><a href="/KGcloud/label_Utils.html"><span class="glyphicon glyphicon-tasks" aria-hidden="true"></span>文本标注</a></li>
+                    <li><a href="/KGcloud/entity.html"><span class="glyphicon glyphicon-tasks" aria-hidden="true"></span>实体查询</a></li>
+                    <li class="active"><a href=""><span class="glyphicon glyphicon-tasks" aria-hidden="true"></span>本体建模</a></li>
+                    <li><a href=""><span class="glyphicon glyphicon-tasks" aria-hidden="true"></span>功能</a></li>
+                    <li><a href=""><span class="glyphicon glyphicon-tasks" aria-hidden="true"></span>功能</a></li>
+                    <li><a href=""><span class="glyphicon glyphicon-tasks" aria-hidden="true"></span>功能</a></li>
+                </ul>
+            </div>
+            <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+                <h1 class="page-header">
+                    <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
+                    本体建模
+                </h1>
+
+                <div class="row placeholders">
+                    <div class="thumbnail" id="main" style="width:600px;height:400px;"></div>
+                </div>
+                <button id="submit" type="button" class="btn btn-default">提交本体</button>
+                <!--分割线-->
+
+                <hr class="simple" color="#6f5499" />
+
+                <!-- 添加三元组标签 -->
+                <div>
+                    <div class="form-group col-md-2">
+                        <button id="triple_creat" type="button" class="btn btn-default">添加三元组</button>
+                    </div>
+                    <div id="triple" class="form-group col-md-10">
+                        <div class="form-group col-md-12" id="triple_form_0">
+                            <div class="col-md-3">
+                                <input id="entity_start_0" class="form-control" name="entity" placeholder="起始实体">
+                            </div>
+                            <div class="col-md-3">
+                                <input id="entity_end_0" class="form-control" name="entity" placeholder="终止实体">
+                            </div>
+                            <div class="col-md-2">
+                                <input id="relation_input_0" class="form-control" name="entity" placeholder="关系名称">
+                            </div>
+                            <div class="col-md-1">
+                                <button id="triple_confirm_0" type="button" class="btn btn-default">确定</button>
+                            </div>
+                            <div class="col-md-1">
+                                <button id="triple_delete_0" disabled="true" type="button" class="btn btn-default removeButton"><span class="glyphicon glyphicon-minus" aria-hidden="true"></span></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script>
+    var triple_index = 0
+    var triple = {}
+
+    var json = {}
+    var links = []
+    var data = []
+    var node = []
+    var same_num = {}
+
+
+    function update_graph(){
+
+
+        //生成无重复的node数组
+        for (var i in triple){
+            if (node.includes(triple[i]["entity1"])){
+            }else{
+                node.push(triple[i]["entity1"])
+            }
+            if (node.includes(triple[i]["entity2"])){
+            }else{
+                node.push(triple[i]["entity2"])
+            }
+        }
+        /**
+         * 将node数组转化为data数据*/
+        for (var j=0;j<node.length;j++){
+            data_mem = {}
+            data_mem["name"] = node[j]
+            data.push(data_mem)
+        }
+        /*
+        * 生成links数据*/
+        for (var i in triple) {
+            links_mem = {}
+            links_mem["source"] = triple[i]["entity1"]
+            links_mem["target"] = triple[i]["entity2"]
+            links_mem["value"] = triple[i]["relation"]
+            links.push(links_mem)
+        }
+        console.log(data)
+        console.log(links)
+        console.log(triple)
+        var chartDom = document.getElementById('main');
+        var myChart = echarts.init(chartDom);
+        option = {
+            //图例
+            tooltip: {},
+            animationDurationUpdate: 1500,
+            animationEasingUpdate: 'quinticInOut',
+            series: [{
+                type: 'graph',
+                //采用引力布局
+                layout: 'force',
+                //是否可以拖动节点
+                draggable: true,
+                //节点尺寸
+                symbolSize: 50,
+                animation: true,
+                //开启鼠标缩放和平移漫游
+                roam: true,
+                //缩放比例
+                nodeScaleRatio: 0.6,
+                //边两端的形状
+                edgeSymbol: ['circle', 'arrow'],
+                //边两端形状的大小
+                edgeSymbolSize: [4, 6],
+                //节点标签的样式
+                label: {
+                    show: true,
+                    position: 'inside',
+                    formatter: '{b}',
+                    fontSize: 10,
+                    fontWeight: "bold"
+                },
+                //边标签的样式
+                edgeLabel: {
+                    show: true,
+                    fontSize: 9,
+                    formatter: "{c}"
+                },
+                //json数据
+                data: data,
+                links: links,
+                //引力图参数
+                force: {
+                    //边的长度
+                    edgeLength: 200,
+                    //排斥值
+                    repulsion: 80,
+                    //引力值
+                    gravity: 0.01
+                },
+                //边的形状参数
+                lineStyle: {
+                    color: 'source',
+                    curveness: 0.2
+                },
+                //高亮状态
+                emphasis: {
+                    scale: true,
+                    focus: 'adjacency',
+                    blurScope: 'coordinateSystem',
+                    lineStyle: {
+                        width: 5
+                    }
+                },
+            }]
+        };
+        myChart.setOption(option)
+        node = []
+        data = []
+        links = []
+    }
+
+    //绑定提交按钮
+    $("#submit").click(function (){
+        $.ajax({
+            type: 'post',
+            url:'http://3580656qa1.qicp.vip/tag/insert',
+            contentType:'application/x-www-form-urlencoded',
+            data:{
+                "result":JSON.stringify(triple)
+            },
+            async:true,
+            dataType:"text",
+            success:function (data,status,xhr) {
+                console.log(data)
+                console.log(status)
+                console.log(xhr)
+                if (data === "saved!"){
+                    alert("提交成功！")
+                }
+                else{
+                    alert("未登录，请您登录！")
+                    //window.location.href="http://3580656qa1.qicp.vip/KGcloud/"
+                }
+            },
+            error:function (xhr,status,error) {
+                console.log(xhr)
+                console.log(status)
+                console.log(error)
+                alert("连接超时")
+            }
+        })
+    })
+    //绑定删除按钮
+    $("#triple_delete_0").click(function (){
+        this_index = $(this).attr("id").toString().split("_")[2]
+        this_triple_form = $(this).parent().parent()
+        delete triple[this_index]
+        this_triple_form.remove()
+        console.log(triple)
+        update_graph()
+    })
+
+    //绑定确认按钮
+    $("#triple_confirm_0").click(function (){
+
+        this_index = $(this).attr("id").toString().split("_")[2]
+        this_triple_form = $(this).parent().parent()
+        this_entity_start = this_triple_form.find("#entity_start_"+this_index.toString())
+        this_entity_end = this_triple_form.find("#entity_end_"+this_index.toString())
+        this_relation_input = this_triple_form.find("#relation_input_"+this_index.toString())
+
+        if (this_entity_start.val().length === 0 || this_entity_end.val().length === 0 || this_relation_input.val().length === 0){
+            alert("请不要输入空值！")
+        }else{
+
+            triple_mem = {"field":"aaa","author":"bbb","entity1":this_entity_start.val(),"entity2":this_entity_end.val(),"relation":this_relation_input.val()}
+            triple[this_index] = triple_mem
+        }
+        console.log(triple)
+        update_graph()
+    })
+
+    //添加实体标签
+    $("#triple_creat").click(function (){
+        triple_index++
+        new_triple_form = $("#triple_form_0").clone(true)
+        new_triple_form.attr("id", "triple_form_"+triple_index.toString())
+
+        new_entity_start = new_triple_form.find("#entity_start_0")
+        new_entity_start.attr("id", "entity_start_"+triple_index.toString())
+        new_entity_start.removeAttr("disabled")
+
+        new_entity_end = new_triple_form.find("#entity_end_0")
+        new_entity_end.attr("id", "entity_end_"+triple_index.toString())
+        new_entity_end.removeAttr("disabled")
+
+        new_relation_input = new_triple_form.find("#relation_input_0")
+        new_relation_input.attr("id", "relation_input_"+triple_index.toString())
+        new_relation_input.removeAttr("disabled")
+
+        new_triple_confirm = new_triple_form.find("#triple_confirm_0")
+        new_triple_confirm.attr("id", "triple_confirm_"+triple_index.toString())
+        new_triple_confirm.removeAttr("disabled")
+
+        new_triple_delete = new_triple_form.find("#triple_delete_0")
+        new_triple_delete.attr("id", "triple_delete_"+triple_index.toString())
+        new_triple_delete.removeAttr("disabled")
+
+        $("#triple").append(new_triple_form)
+    })
+
+</script>
+</html>
